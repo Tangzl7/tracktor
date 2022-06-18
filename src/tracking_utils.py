@@ -158,6 +158,10 @@ def clip_boxes_to_image(boxes, size):
 
 def nms(dets, scores, thresh):
     """Numpy based NMS"""
+    keep = []
+    if dets.size == 0:
+        return keep
+
     x1 = dets[:, 0]
     y1 = dets[:, 1]
     x2 = dets[:, 2]
@@ -166,7 +170,6 @@ def nms(dets, scores, thresh):
     areas = (x2 - x1 + 1) * (y2 - y1 + 1)
     order = scores.argsort()[::-1] # get boxes with more ious first
 
-    keep = []
     while order.size > 0:
         i = order[0]  # pick maximum iou box
         keep.append(i)

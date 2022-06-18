@@ -136,7 +136,8 @@ mot_dataset_path: './data'
 backbone: 'resnet_v1.5_50'
 
 # eval.py FasterRcnn evaluation
-checkpoint_path: "./faster_rcnn-30_299.ckpt"
+checkpoint_path: "./tracktor.ckpt"
+reid_weight: "./reid.ckpt"
 
 # export.py fasterrcnn_export
 file_name: "faster_rcnn"
@@ -165,6 +166,8 @@ warp_mode: 'MOTION_EUCLIDEAN'
 number_of_iterations: 100
 # Threshold increment between two iterations (original 0.001)
 termination_eps: 0.00001
+# Use siamese network to do reid
+do_reid: True
 # How much timesteps dead tracks are kept and cosidered for reid
 inactive_patience: 50
 # How many last appearance features are to keep

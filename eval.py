@@ -22,10 +22,11 @@ from tqdm import tqdm
 
 from src.FasterRcnn.faster_rcnn import FeatureExtractorFasterRcnn
 from src.FasterRcnn.faster_rcnn import HeadInferenceFasterRcnn
+from src.reid import ResNet50_FC512
 from src.dataset import MOTSequence
 from src.dataset import image_preprocess_fn
 from src.model_utils.config import config
-from src.tracker import Tracker
+from src.tracker_plus_plus import Tracker
 from src.tracking_utils import SingleModelFasterRCNN
 from src.tracking_utils import evaluate_mot_accums
 from src.tracking_utils import get_mot_accum
@@ -59,9 +60,15 @@ def main():
         inference_head=faster_rcnn_head_inference,
         preprocessing_function=lambda image_data: image_preprocess_fn(image_data, config=config),
     )
+
+    reid = ResNet50_FC512()
+    param_dict_reid = ms.load_checkpoint(config.reid_weight)
+    ms.load_param_into_net(reid, param_dict_reid)
+    reid.set_train(False)
+
     tracker = Tracker(
         obj_detect=wrapped_object_detector,
-        reid_network=None,
+        reid_network=reid,
         tracker_cfg=config,
     )
 
