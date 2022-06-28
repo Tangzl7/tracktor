@@ -30,7 +30,7 @@ from src.tracking_utils import nms
 from src.tracking_utils import warp_pos
 
 
-class Tracker:
+class TrackerPlusPlus:
     """
     Tracker class, handle all tracking logic.
 

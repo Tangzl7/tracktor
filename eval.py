@@ -26,7 +26,8 @@ from src.reid import ResNet50_FC512
 from src.dataset import MOTSequence
 from src.dataset import image_preprocess_fn
 from src.model_utils.config import config
-from src.tracker_plus_plus import Tracker
+from src.tracker import Tracker
+from src.tracker_plus_plus import TrackerPlusPlus
 from src.tracking_utils import SingleModelFasterRCNN
 from src.tracking_utils import evaluate_mot_accums
 from src.tracking_utils import get_mot_accum
@@ -66,7 +67,7 @@ def main():
     ms.load_param_into_net(reid, param_dict_reid)
     reid.set_train(False)
 
-    tracker = Tracker(
+    tracker = TrackerPlusPlus(
         obj_detect=wrapped_object_detector,
         reid_network=reid,
         tracker_cfg=config,
