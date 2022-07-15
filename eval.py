@@ -17,10 +17,9 @@
 
 import mindspore as ms
 from mindspore import context
+from mindspore.common import dtype as mstype
 import numpy as np
 from tqdm import tqdm
-
-import mindspore.common.dtype as mstype
 
 from src.FasterRcnn.faster_rcnn import FeatureExtractorFasterRcnn
 from src.FasterRcnn.faster_rcnn import HeadInferenceFasterRcnn
@@ -69,7 +68,7 @@ def main():
     if config.device_target == "Ascend":
         wrapped_object_detector.to_float(mstype.float16)
 
-    reid = ResNet50_FC512()
+    reid = ResNet50_FC512(layers=[3, 4, 6, 3])
     param_dict_reid = ms.load_checkpoint(config.reid_weight)
     ms.load_param_into_net(reid, param_dict_reid)
     reid.set_train(False)

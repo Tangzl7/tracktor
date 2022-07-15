@@ -124,7 +124,7 @@ class ResNet50_FC512(nn.Cell):
     def __init__(
             self,
             block: Type[Union[BasicBlock, Bottleneck]] = Bottleneck,
-            layers: List[int] = [3, 4, 6, 3],
+            layers=None,
             num_classes: int = 1,
             zero_init_residual: bool = False,
             groups: int = 1,
@@ -133,6 +133,8 @@ class ResNet50_FC512(nn.Cell):
             norm_layer: Optional[Callable[..., nn.Cell]] = None,
     ) -> None:
         super().__init__()
+        if layers is None:
+            layers = [3, 4, 6, 3]
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
