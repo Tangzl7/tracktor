@@ -256,7 +256,7 @@ epoch time: 136270.695 ms, per step time: 455.755 ms
 python eval.py
 ```
 
-Note: `mot_dataset_path` is the path to MOT17 dataset, `image_dir` is the path to MOT17DET dataset for training.
+Note: set the device(GPU, Ascend) in default_config.yaml, `mot_dataset_path` is the path to MOT17 dataset, `image_dir` is the path to MOT17DET dataset for training.
 
 ### Result
 
