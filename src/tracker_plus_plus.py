@@ -272,7 +272,7 @@ class TrackerPlusPlus:
                     self.inactive_tracks.remove(t)
 
                 keep = np.array([i for i in range(len(new_det_pos)) if i not in assigned])
-                if len(keep) > 0:
+                if np.size(keep) > 0:
                     new_det_pos = new_det_pos[keep]
                     new_det_score = new_det_score[keep]
                     new_det_features = new_det_features[keep]
@@ -321,7 +321,7 @@ class TrackerPlusPlus:
 
             self.tracks_to_inactive([self.tracks[i] for i in list(range(len(self.tracks))) if i not in keep])
 
-            if len(keep) > 0 and self.do_reid:
+            if np.size(keep) > 0 and self.do_reid:
                 new_features = self.get_appearances(blob, self.get_pos())
                 self.add_features(new_features)
 

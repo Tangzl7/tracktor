@@ -42,6 +42,7 @@ for((i=0; i<${DEVICE_NUM}; i++))
 do
     export DEVICE_ID=$i
     export RANK_ID=$i
+    # shellcheck disable=SC2115
     rm -rf $OUTPUT_PATH/$OUTPUT_PATH$i
     mkdir $OUTPUT_PATH/$OUTPUT_PATH$i
     cp ./*.py $OUTPUT_PATH/$OUTPUT_PATH$i

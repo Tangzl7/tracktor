@@ -219,11 +219,11 @@ For evaluation specify path to trained checkpoints.
 4225 epoch: 30 step: 292 total_loss: 0.03315
 4226 epoch: 30 step: 293 total_loss: 0.01891
 4226 epoch: 30 step: 294 total_loss: 0.04566
-4227 epoch: 30 step: 295 total_loss: 0.02666 
-4227 epoch: 30 step: 296 total_loss: 0.02234 
-4227 epoch: 30 step: 297 total_loss: 0.03690 
+4227 epoch: 30 step: 295 total_loss: 0.02666
+4227 epoch: 30 step: 296 total_loss: 0.02234
+4227 epoch: 30 step: 297 total_loss: 0.03690
 4228 epoch: 30 step: 298 total_loss: 0.04819
-4228 epoch: 30 step: 299 total_loss: 0.03124 
+4228 epoch: 30 step: 299 total_loss: 0.03124
 # performance log(8p)
 epoch time: 139498.944 ms, per step time: 466.552 ms
 epoch time: 139704.187 ms, per step time: 467.238 ms
@@ -263,14 +263,14 @@ Note: set the device(GPU, Ascend) in default_config.yaml, `mot_dataset_path` is 
 Eval result will be printed in std out.
 
 ```text
-                IDF1   IDP   IDR  Rcll  Prcn  GT  MT  PT  ML   FP    FN IDs   FM  MOTA  MOTP IDt IDa IDm                
-MOT17-02-FRCNN 43.4% 75.0% 30.5% 40.6% 99.7%  62   9  31  22   25 11041  60   63 40.1% 0.100   7  57   5                
-MOT17-04-FRCNN 71.5% 89.3% 59.6% 64.7% 97.0%  83  36  28  19  959 16794  22   37 62.6% 0.107   0  22   0                
-MOT17-05-FRCNN 59.6% 80.4% 47.3% 56.6% 96.1% 133  33  63  37  158  3004  65   68 53.3% 0.138  16  57  10                
-MOT17-09-FRCNN 59.4% 76.1% 48.8% 63.1% 98.5%  26  11  13   2   50  1964  28   29 61.7% 0.063   6  26   4                
-MOT17-10-FRCNN 60.4% 71.0% 52.6% 73.3% 99.1%  57  33  21   3   87  3424  85   81 72.0% 0.124  14  74   4                
-MOT17-11-FRCNN 64.6% 78.3% 55.0% 68.7% 97.7%  75  25  32  18  154  2956  23   25 66.8% 0.064   3  21   1                
-MOT17-13-FRCNN 73.6% 86.0% 64.4% 74.1% 99.0% 110  59  41  10   89  3018  65   73 72.8% 0.146  20  53   9                
+                IDF1   IDP   IDR  Rcll  Prcn  GT  MT  PT  ML   FP    FN IDs   FM  MOTA  MOTP IDt IDa IDm
+MOT17-02-FRCNN 43.4% 75.0% 30.5% 40.6% 99.7%  62   9  31  22   25 11041  60   63 40.1% 0.100   7  57   5
+MOT17-04-FRCNN 71.5% 89.3% 59.6% 64.7% 97.0%  83  36  28  19  959 16794  22   37 62.6% 0.107   0  22   0
+MOT17-05-FRCNN 59.6% 80.4% 47.3% 56.6% 96.1% 133  33  63  37  158  3004  65   68 53.3% 0.138  16  57  10
+MOT17-09-FRCNN 59.4% 76.1% 48.8% 63.1% 98.5%  26  11  13   2   50  1964  28   29 61.7% 0.063   6  26   4
+MOT17-10-FRCNN 60.4% 71.0% 52.6% 73.3% 99.1%  57  33  21   3   87  3424  85   81 72.0% 0.124  14  74   4
+MOT17-11-FRCNN 64.6% 78.3% 55.0% 68.7% 97.7%  75  25  32  18  154  2956  23   25 66.8% 0.064   3  21   1
+MOT17-13-FRCNN 73.6% 86.0% 64.4% 74.1% 99.0% 110  59  41  10   89  3018  65   73 72.8% 0.146  20  53   9
 OVERALL        64.5% 82.8% 52.8% 62.4% 97.9% 546 206 229 111 1522 42201 348  376 60.8% 0.109  66 310  33
 ```
 

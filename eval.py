@@ -19,6 +19,7 @@ import mindspore as ms
 from mindspore import context
 import numpy as np
 from tqdm import tqdm
+
 import mindspore.common.dtype as mstype
 
 from src.FasterRcnn.faster_rcnn import FeatureExtractorFasterRcnn
@@ -27,7 +28,6 @@ from src.reid import ResNet50_FC512
 from src.dataset import MOTSequence
 from src.dataset import image_preprocess_fn
 from src.model_utils.config import config
-from src.tracker import Tracker
 from src.tracker_plus_plus import TrackerPlusPlus
 from src.tracking_utils import SingleModelFasterRCNN
 from src.tracking_utils import evaluate_mot_accums

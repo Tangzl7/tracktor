@@ -1,8 +1,6 @@
-import numpy as np
-from typing import Type, Tuple, Any, List, Callable, Optional, Union
+from typing import Type, List, Callable, Optional, Union
 
-import mindspore as ms
-from mindspore import nn, Tensor, save_checkpoint, load_checkpoint, context
+from mindspore import nn, Tensor
 from mindspore.ops import operations as P
 
 def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
@@ -156,10 +154,10 @@ class ResNet50_FC512(nn.Cell):
         self.avgpool = P.AdaptiveAvgPool2D((1, 1))
         self.mean = P.ReduceMean(keep_dims=True)
         self.fc = nn.SequentialCell([
-                nn.Dense(512 * block.expansion, 512, has_bias=True),
-                nn.BatchNorm1d(512),
-                nn.ReLU()
-            ])
+            nn.Dense(512 * block.expansion, 512, has_bias=True),
+            nn.BatchNorm1d(512),
+            nn.ReLU()
+        ])
         self.classifier = nn.Dense(512, num_classes, weight_init="Uniform")
         self.flatten = P.Flatten()
 
@@ -220,9 +218,9 @@ class ResNet50_FC512(nn.Cell):
 
         if not self.training:
             return self.fc(x)
-        else:
-            x = self.fc(x)
-            return self.classifier(x)
+
+        x = self.fc(x)
+        return self.classifier(x)
 
     def construct(self, x: Tensor) -> Tensor:
         return self._forward_impl(x)
