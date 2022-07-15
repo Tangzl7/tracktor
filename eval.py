@@ -19,6 +19,7 @@ import mindspore as ms
 from mindspore import context
 import numpy as np
 from tqdm import tqdm
+import mindspore.common.dtype as mstype
 
 from src.FasterRcnn.faster_rcnn import FeatureExtractorFasterRcnn
 from src.FasterRcnn.faster_rcnn import HeadInferenceFasterRcnn
@@ -35,11 +36,13 @@ from src.tracking_utils import get_mot_accum
 
 def main():
     """Run eval"""
-    context.set_context(mode=context.GRAPH_MODE)
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
 
     faster_rcnn_head_inference = HeadInferenceFasterRcnn(
         net_config=config,
     )
+    if config.device_target == "Ascend":
+        faster_rcnn_head_inference.to_float(mstype.float16)
     faster_rcnn_head_inference.set_train(False)
 
     param_dict = ms.load_checkpoint(config.checkpoint_path)
@@ -50,6 +53,8 @@ def main():
     faster_rcnn_feature_extractor = FeatureExtractorFasterRcnn(
         net_config=config,
     )
+    if config.device_target == "Ascend":
+        faster_rcnn_feature_extractor.to_float(mstype.float16)
     faster_rcnn_feature_extractor.set_train(False)
 
     ms.load_param_into_net(
@@ -61,6 +66,8 @@ def main():
         inference_head=faster_rcnn_head_inference,
         preprocessing_function=lambda image_data: image_preprocess_fn(image_data, config=config),
     )
+    if config.device_target == "Ascend":
+        wrapped_object_detector.to_float(mstype.float16)
 
     reid = ResNet50_FC512()
     param_dict_reid = ms.load_checkpoint(config.reid_weight)

@@ -1,6 +1,6 @@
 # Contents
 
-- [Tracktor Description](#fasterrcnn-description)
+- [Tracktor++ Description](#fasterrcnn-description)
 - [FasterRcnn Description](#fasterrcnn-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
@@ -20,9 +20,9 @@
         - [Inference Performance](#inference-performance)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
-# Tracktor Description
+# Tracktor++ Description
 
-We present a tracker (without bells and whistles) that accomplishes tracking without specifically targeting any of tracking tasks,
+The problem of tracking multiple objects in a video se-quence poses several challenging tasks. For tracking-by-detection, these include object re-identification, motion pre-diction and dealing with occlusions.We present a tracker (without bells and whistles) that accomplishes tracking without specifically targeting any of tracking tasks,
 in particular, we perform no training or optimization on tracking data.
 We exploit the bounding box regression of the Faster RCNN object detector to predict the position of an object in the next frame,
 thereby converting a detector into a Tracktor.
@@ -80,6 +80,7 @@ Note:
 
 1. the first run will generate the mindrecord file, which will take a long time.
 2. pretrained model is a faster rcnn resnet50 checkpoint that trained over COCO. you can train it with [faster_rcnn](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) scripts in modelzoo. Or you can download it from [hub](https://download.mindspore.cn/model_zoo/r1.3/fasterrcnnresnetv1550_ascend_v130_coco2017_official_cv_bs2_acc61.7/)
+3. re-identification network model comes from the [official implementation model](https://vision.in.tum.de/webshare/u/meinhard/tracking_wo_bnw-output_v5.zip) of pytorch and converts it to mindspore's ckpt file.
 
 ## Run on GPU
 
@@ -95,20 +96,26 @@ Before running train scripts, you must specify all paths in `default_config.yaml
 
 For evaluation specify path to trained checkpoints.
 
-`checkpoint_path`, `ckpt_file`.
+`checkpoint_path`, `ckpt_file`, `reid_weight`
 
 Note: `mot_dataset_path` is the path to MOT17 dataset, `image_dir` is the path to MOT17DET dataset for training.
 
 ```bash
 
-# standalone training
+# standalone training on gpu
 bash scripts/run_standalone_train_gpu.sh [DEVICE_ID] [CONFIG_PATH]
 
-# distributed training
+# standalone training on ascend
+bash scripts/run_standalone_train_ascend.sh [DEVICE_ID] [CONFIG_PATH]
+
+# distributed training on gpu
 bash scripts/run_distributed_train_gpu.sh [DEVICE_NUM] [CONFIG_PATH] [LR]
 
+# distributed training on ascend
+bash scripts/run_distributed_train_ascend.sh [DEVICE_NUM] [CONFIG_PATH] [RANK_TABLE_FILE] [LR]
+
 # eval
-bash scripts/run_eval_gpu.sh [DEVICE_ID] [MOT_DATASET_PATH] [CKPT_PATH]
+python eval.py
 ```
 
 # Script Description
@@ -117,12 +124,13 @@ bash scripts/run_eval_gpu.sh [DEVICE_ID] [MOT_DATASET_PATH] [CKPT_PATH]
 
 ```text
 .
-└─faster_rcnn
+└─tracktor++
   ├─README.md                         // descriptions about fasterrcnn
   ├─scripts
     ├─run_standalone_train_gpu.sh     // shell script for standalone on GPU
     ├─run_distribute_train_gpu.sh     // shell script for distributed on GPU
-    └─run_eval_gpu.sh                 // shell script for eval on GPU
+    ├─run_standalone_train_ascend.sh     // shell script for standalone on Ascend
+    └─run_distribute_train_ascend.sh     // shell script for distributed Ascend
   ├─src
     ├─FasterRcnn
       ├─__init__.py                   // init file
@@ -140,7 +148,9 @@ bash scripts/run_eval_gpu.sh [DEVICE_ID] [MOT_DATASET_PATH] [CKPT_PATH]
     ├─dataset.py                      // create dataset and process dataset
     ├─lr_schedule.py                  // learning ratio generator
     ├─network_define.py               // network define for fasterrcnn
-    ├─tracker.py                      // tracker class for tracktor
+    ├─reid.py                         // reid class
+    ├─tracker.py                      // tracker class
+    ├─tracker_plus_plus.py                      // tracker++ class
     ├─tracking_utils.py               // tracker utils
     ├─util.py                         // routine operation
     └─model_utils
@@ -148,11 +158,12 @@ bash scripts/run_eval_gpu.sh [DEVICE_ID] [MOT_DATASET_PATH] [CKPT_PATH]
       ├─device_adapter.py             // Get cloud ID
       ├─local_adapter.py              // Get local ID
       └─moxing_adapter.py             // Parameter processing
-  ├─default_config.yaml               // config for tracktor
-  ├─export.py                         // script to export AIR,MINDIR,ONNX model
-  ├─eval.py                           // eval scripts
-  ├─eval_detector.py                  // helper scripts for evaluation detection metrics.
-  └─train.py                          // train scripts
+    ├─default_config.yaml               // config for tracktor
+    ├─export.py                         // script to export AIR,MINDIR,ONNX model
+    ├─eval.py                           // eval scripts
+    ├─eval_detector.py                  // helper scripts for evaluation detection metrics.
+    ├─prepare_detection_anno.py          // prepare annotations from dataset
+    └─train.py                          // train scripts
 ```
 
 ## Training Process
@@ -169,6 +180,16 @@ bash scripts/run_standalone_train_gpu.sh [DEVICE_ID] [CONFIG_PATH]
 bash scripts/run_distributed_train_gpu.sh [DEVICE_NUM] [CONFIG_PATH] [LR]
 ```
 
+#### on Ascend
+
+```bash
+# standalone training
+bash scripts/run_standalone_train_ascend.sh [DEVICE_ID] [CONFIG_PATH]
+
+# distributed training
+bash scripts/run_distributed_train_ascend.sh [DEVICE_NUM] [CONFIG_PATH] [RANK_TABLE_FILE] [LR]
+```
+
 Before train you must unzip all datasets, and prepare annotation for training using
 
 ```bash
@@ -181,45 +202,47 @@ Then you must specify all paths in `default_config.yaml`.
 
 For evaluation specify path to trained checkpoints.
 
-`checkpoint_path`, `ckpt_file`.
+`checkpoint_path`, `ckpt_file`, `reid_weight`
 
 ### Result
 
 ```text
 # distribute training result(8p)
 # loss logs
-3406 epoch: 30 step: 285 total_loss: 0.09377
-3406 epoch: 30 step: 286 total_loss: 0.09688
-3406 epoch: 30 step: 287 total_loss: 0.06130
-3407 epoch: 30 step: 288 total_loss: 0.03282
-3407 epoch: 30 step: 289 total_loss: 0.19695
-3407 epoch: 30 step: 290 total_loss: 0.14444
-3408 epoch: 30 step: 291 total_loss: 0.06046
-3408 epoch: 30 step: 292 total_loss: 0.05724
-3408 epoch: 30 step: 293 total_loss: 0.09789
-3409 epoch: 30 step: 294 total_loss: 0.07339
-3409 epoch: 30 step: 295 total_loss: 0.05054
-3409 epoch: 30 step: 296 total_loss: 0.09697
-3410 epoch: 30 step: 297 total_loss: 0.03201
-3410 epoch: 30 step: 298 total_loss: 0.04093
-3410 epoch: 30 step: 299 total_loss: 0.04519
-# performance log
-epoch time: 111428.575 ms, per step time: 372.671 ms
-epoch time: 111417.881 ms, per step time: 372.635 ms
-epoch time: 111318.437 ms, per step time: 372.302 ms
-epoch time: 111659.650 ms, per step time: 373.444 ms
-epoch time: 111388.490 ms, per step time: 372.537 ms
-epoch time: 111826.518 ms, per step time: 374.002 ms
-epoch time: 111565.894 ms, per step time: 373.130 ms
-epoch time: 111735.482 ms, per step time: 373.697 ms
-epoch time: 106787.494 ms, per step time: 357.149 ms
-epoch time: 106757.486 ms, per step time: 357.048 ms
-epoch time: 106889.161 ms, per step time: 357.489 ms
-epoch time: 106865.015 ms, per step time: 357.408 ms
-epoch time: 107085.235 ms, per step time: 358.145 ms
-epoch time: 106946.509 ms, per step time: 357.681 ms
-epoch time: 106842.626 ms, per step time: 357.333 ms
-epoch time: 106928.893 ms, per step time: 357.622 ms
+4223 epoch: 30 step: 285 total_loss: 0.01451
+4223 epoch: 30 step: 286 total_loss: 0.02001
+4223 epoch: 30 step: 287 total_loss: 0.04003
+4224 epoch: 30 step: 288 total_loss: 0.00887
+4224 epoch: 30 step: 289 total_loss: 0.06539
+4225 epoch: 30 step: 290 total_loss: 0.02722
+4225 epoch: 30 step: 291 total_loss: 0.01804
+4225 epoch: 30 step: 292 total_loss: 0.03315
+4226 epoch: 30 step: 293 total_loss: 0.01891
+4226 epoch: 30 step: 294 total_loss: 0.04566
+4227 epoch: 30 step: 295 total_loss: 0.02666 
+4227 epoch: 30 step: 296 total_loss: 0.02234 
+4227 epoch: 30 step: 297 total_loss: 0.03690 
+4228 epoch: 30 step: 298 total_loss: 0.04819
+4228 epoch: 30 step: 299 total_loss: 0.03124 
+# performance log(8p)
+epoch time: 139498.944 ms, per step time: 466.552 ms
+epoch time: 139704.187 ms, per step time: 467.238 ms
+epoch time: 140592.005 ms, per step time: 470.207 ms
+epoch time: 139428.319 ms, per step time: 466.315 ms
+epoch time: 137525.859 ms, per step time: 459.953 ms
+epoch time: 137886.593 ms, per step time: 461.159 ms
+epoch time: 137500.194 ms, per step time: 459.867 ms
+epoch time: 137728.669 ms, per step time: 460.631 ms
+epoch time: 138675.862 ms, per step time: 463.799 ms
+epoch time: 138227.512 ms, per step time: 462.299 ms
+epoch time: 138066.521 ms, per step time: 461.761 ms
+epoch time: 138174.681 ms, per step time: 462.123 ms
+epoch time: 134701.477 ms, per step time: 450.507 ms
+epoch time: 134832.047 ms, per step time: 450.943 ms
+epoch time: 134882.822 ms, per step time: 451.113 ms
+epoch time: 135607.888 ms, per step time: 453.538 ms
+epoch time: 135825.521 ms, per step time: 454.266 ms
+epoch time: 136270.695 ms, per step time: 455.755 ms
 ```
 
 ## Evaluation Process
@@ -230,7 +253,7 @@ epoch time: 106928.893 ms, per step time: 357.622 ms
 
 ```bash
 # eval on GPU
-bash scripts/run_eval_gpu.sh [DEVICE_ID] [MOT_DATASET_PATH] [CKPT_PATH]
+python eval.py
 ```
 
 Note: `mot_dataset_path` is the path to MOT17 dataset, `image_dir` is the path to MOT17DET dataset for training.
@@ -240,16 +263,15 @@ Note: `mot_dataset_path` is the path to MOT17 dataset, `image_dir` is the path t
 Eval result will be printed in std out.
 
 ```text
-                IDF1   IDP   IDR  Rcll  Prcn  GT  MT  PT  ML   FP    FN IDs   FM  MOTA  MOTP IDt IDa IDm
-MOT17-02-FRCNN 42.0% 71.8% 29.7% 40.9% 99.1%  62   9  30  23   71 10973  66   67 40.2% 0.126  10  61   5
-MOT17-04-FRCNN 69.9% 87.6% 58.2% 64.3% 96.8%  83  32  32  19 1013 16980  27   53 62.1% 0.129   8  21   2
-MOT17-05-FRCNN 58.8% 78.3% 47.0% 57.1% 95.1% 133  32  67  34  205  2966  66   71 53.2% 0.167  13  62   9
-MOT17-09-FRCNN 49.4% 63.9% 40.2% 61.6% 98.1%  26   9  14   3   65  2043  39   42 59.7% 0.165   9  33   3
-MOT17-10-FRCNN 60.0% 70.1% 52.5% 72.0% 96.2%  57  29  25   3  364  3596  90  148 68.5% 0.178  20  72   4
-MOT17-11-FRCNN 63.3% 76.2% 54.1% 68.8% 97.0%  75  26  31  18  201  2945  29   27 66.4% 0.093   5  26   3
-MOT17-13-FRCNN 69.7% 80.6% 61.4% 73.9% 97.0% 110  61  38  11  267  3034 123  117 70.6% 0.175  35  99  11
-OVERALL        62.5% 80.0% 51.3% 62.1% 97.0% 546 198 237 111 2186 42537 440  525 59.8% 0.141 100 374  37
-
+                IDF1   IDP   IDR  Rcll  Prcn  GT  MT  PT  ML   FP    FN IDs   FM  MOTA  MOTP IDt IDa IDm                
+MOT17-02-FRCNN 43.4% 75.0% 30.5% 40.6% 99.7%  62   9  31  22   25 11041  60   63 40.1% 0.100   7  57   5                
+MOT17-04-FRCNN 71.5% 89.3% 59.6% 64.7% 97.0%  83  36  28  19  959 16794  22   37 62.6% 0.107   0  22   0                
+MOT17-05-FRCNN 59.6% 80.4% 47.3% 56.6% 96.1% 133  33  63  37  158  3004  65   68 53.3% 0.138  16  57  10                
+MOT17-09-FRCNN 59.4% 76.1% 48.8% 63.1% 98.5%  26  11  13   2   50  1964  28   29 61.7% 0.063   6  26   4                
+MOT17-10-FRCNN 60.4% 71.0% 52.6% 73.3% 99.1%  57  33  21   3   87  3424  85   81 72.0% 0.124  14  74   4                
+MOT17-11-FRCNN 64.6% 78.3% 55.0% 68.7% 97.7%  75  25  32  18  154  2956  23   25 66.8% 0.064   3  21   1                
+MOT17-13-FRCNN 73.6% 86.0% 64.4% 74.1% 99.0% 110  59  41  10   89  3018  65   73 72.8% 0.146  20  53   9                
+OVERALL        64.5% 82.8% 52.8% 62.4% 97.9% 546 206 229 111 1522 42201 348  376 60.8% 0.109  66 310  33
 ```
 
 ## Model Export
@@ -258,7 +280,7 @@ OVERALL        62.5% 80.0% 51.3% 62.1% 97.0% 546 198 237 111 2186 42537 440  525
 python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_format[EXPORT_FORMAT]
 ```
 
-`EXPORT_FORMAT` should be in ["MINDIR"]
+`EXPORT_FORMAT` should be in ["MINDIR", "AIR"]
 
 # Model Description
 
@@ -268,29 +290,29 @@ python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --device_ta
 
 | Parameters          | GPU                                                                                                      |
 |---------------------|----------------------------------------------------------------------------------------------------------|
-| Resource            | 8xRTX-3090                                                                                               |
-| uploaded Date       | 02/08/2022 (month/day/year)                                                                              |
-| MindSpore Version   | 1.5.0                                                                                                    |
+| Resource            | V100                                                                                                     |
+| uploaded Date       | 07/14/2022 (month/day/year)                                                                              |
+| MindSpore Version   | 1.7.0                                                                                                    |
 | Dataset             | MOT17                                                                                                    |
 | Training Parameters | epoch=30,  batch_size=2                                                                                  |
 | Optimizer           | SGD                                                                                                      |
 | Loss Function       | Softmax Cross Entropy, Sigmoid Cross Entropy,SmoothL1Loss                                                |
-| Speed               | 1pcs 256.678 ms/step 8pcs: 357.489 ms/step                                                               |
-| Total time          | 1pcs 5 hours 8pcs: 1 hour                                                                                |
+| Speed               | 1pcs 361.288 ms/step 8pcs: 462.123 ms/step                                                               |
+| Total time          | 1pcs 7 hours 8pcs: 1 hour                                                                                |
 | Parameters (M)      | 250                                                                                                      |
 | Scripts             | [fasterrcnn script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/faster_rcnn) |
 
 ### Inference Performance
 
-| Parameters          | GPU                         |
+| Parameters          | Ascend                      |
 |---------------------|-----------------------------|
-| Resource            | GPU                         |
-| Uploaded Date       | 02/08/2022 (month/day/year) |
-| MindSpore Version   | 1.5.0                       |
+| Resource            | Ascend                      |
+| Uploaded Date       | 07/14/2022 (month/day/year) |
+| MindSpore Version   | 1.7.0                       |
 | Dataset             | MOT17                       |
-| batch_size          | 2                           |
+| batch_size          | 1                           |
 | outputs             | MOTA                        |
-| Accuracy            | 59.8%                       |
+| Accuracy            | 60.7%                       |
 | Model for inference | 250M (.ckpt file)           |
 
 # [ModelZoo Homepage](#contents)  
