@@ -30,7 +30,6 @@ export DEVICE_NUM=$1
 export RANK_SIZE=$1
 export RANK_TABLE_FILE=$3
 CONFIG_PATH="$2"
-BASE_LR="$4"
 
 OUTPUT_PATH="run_distribute_train"
 
@@ -60,7 +59,6 @@ do
     --save_checkpoint_path="./" \
     --run_distribute=True \
     --device_target="Ascend" \
-    --device_num="$RANK_SIZE" \
-    --base_lr="$BASE_LR" > log.txt 2>&1 &
+    --device_num="$RANK_SIZE" > log.txt 2>&1 &
     cd ../../
 done

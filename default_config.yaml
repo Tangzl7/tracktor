@@ -97,7 +97,7 @@ test_max_per_img: 100
 test_batch_size: 1
 
 # LR
-base_lr: 0.001
+base_lr: 0.06
 warmup_step: 1000
 warmup_ratio: 0.001
 

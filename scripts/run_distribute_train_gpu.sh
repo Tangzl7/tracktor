@@ -26,7 +26,6 @@ fi
 
 export RANK_SIZE=$1
 CONFIG_PATH="$2"
-BASE_LR="$3"
 
 OUTPUT_PATH="run_distribute_train"
 
@@ -42,5 +41,4 @@ mpirun -n $RANK_SIZE --output-filename "$OUTPUT_PATH"/log_output --allow-run-as-
     --save_checkpoint_path="$OUTPUT_PATH" \
     --run_distribute=True \
     --device_target="GPU" \
-    --device_num="$RANK_SIZE" \
-    --base_lr="$BASE_LR" > "$OUTPUT_PATH"/log.txt 2>&1 &
+    --device_num="$RANK_SIZE" > "$OUTPUT_PATH"/log.txt 2>&1 &
