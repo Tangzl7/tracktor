@@ -79,7 +79,7 @@ After installing MindSpore via the official website, you can start training and 
 Note:
 
 1. the first run will generate the mindrecord file, which will take a long time.
-2. pretrained model is a faster rcnn resnet50 checkpoint that trained over COCO. you can train it with [faster_rcnn](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) scripts in modelzoo. Or you can download it from [hub](https://download.mindspore.cn/model_zoo/r1.3/fasterrcnnresnetv1550_ascend_v130_coco2017_official_cv_bs2_acc61.7/)
+2. pretrained model is a faster rcnn resnet50 checkpoint that trained over COCO. you can train it with [faster_rcnn](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) scripts in modelzoo. Or you can download it from [hub](https://download.mindspore.cn/model_zoo/r1.3/fasterrcnnresnetv1550_ascend_v130_coco2017_official_cv_bs2_acc61.7/).  And place it in the tracktor++ directory.
 3. re-identification network model comes from the [official implementation model](https://vision.in.tum.de/webshare/u/meinhard/tracking_wo_bnw-output_v5.zip) of pytorch and converts it to mindspore's ckpt file.
 
 ## Run on GPU
@@ -109,10 +109,10 @@ bash scripts/run_standalone_train_gpu.sh [DEVICE_ID] [CONFIG_PATH]
 bash scripts/run_standalone_train_ascend.sh [DEVICE_ID] [CONFIG_PATH]
 
 # distributed training on gpu
-bash scripts/run_distributed_train_gpu.sh [DEVICE_NUM] [CONFIG_PATH] [LR]
+bash scripts/run_distribute_train_gpu.sh [DEVICE_NUM] [CONFIG_PATH]
 
 # distributed training on ascend
-bash scripts/run_distributed_train_ascend.sh [DEVICE_NUM] [CONFIG_PATH] [RANK_TABLE_FILE] [LR]
+bash scripts/run_distribute_train_ascend.sh [DEVICE_NUM] [CONFIG_PATH] [RANK_TABLE_FILE]
 
 # eval
 python eval.py
@@ -177,7 +177,7 @@ python eval.py
 bash scripts/run_standalone_train_gpu.sh [DEVICE_ID] [CONFIG_PATH]
 
 # distributed training
-bash scripts/run_distributed_train_gpu.sh [DEVICE_NUM] [CONFIG_PATH] [LR]
+bash scripts/run_distributed_train_gpu.sh [DEVICE_NUM] [CONFIG_PATH]
 ```
 
 #### on Ascend
@@ -187,7 +187,7 @@ bash scripts/run_distributed_train_gpu.sh [DEVICE_NUM] [CONFIG_PATH] [LR]
 bash scripts/run_standalone_train_ascend.sh [DEVICE_ID] [CONFIG_PATH]
 
 # distributed training
-bash scripts/run_distributed_train_ascend.sh [DEVICE_NUM] [CONFIG_PATH] [RANK_TABLE_FILE] [LR]
+bash scripts/run_distributed_train_ascend.sh [DEVICE_NUM] [CONFIG_PATH] [RANK_TABLE_FILE]
 ```
 
 Before train you must unzip all datasets, and prepare annotation for training using

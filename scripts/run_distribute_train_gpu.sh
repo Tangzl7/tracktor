@@ -14,10 +14,10 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 3 ] ; then
+if [ $# != 2 ] ; then
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash scripts/run_distributed_train_gpu.sh [DEVICE_NUM] [CONFIG_PATH] [LR]"
+echo "bash scripts/run_distributed_train_gpu.sh [DEVICE_NUM] [CONFIG_PATH]"
 echo "for example: bash scripts/run_distributed_train_gpu.sh 8 ./default_config.yaml 0.008"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="

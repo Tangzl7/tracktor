@@ -14,11 +14,11 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 4 ] ; then
+if [ $# != 3 ] ; then
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash scripts/run_distributed_train_ascend.sh [DEVICE_NUM] [CONFIG_PATH] [RANK_TABLE_FILE] [LR]"
-echo "for example: bash scripts/run_distributed_train_gpu.sh 8 ./default_config.yaml /home/hccl_8p_01234567_192.168.88.13.json 0.008"
+echo "bash scripts/run_distributed_train_ascend.sh [DEVICE_NUM] [CONFIG_PATH] [RANK_TABLE_FILE]"
+echo "for example: bash scripts/run_distributed_train_gpu.sh 8 ./default_config.yaml /home/hccl_8p_01234567_192.168.88.13.json"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 exit 1;
