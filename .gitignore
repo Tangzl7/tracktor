@@ -133,3 +133,4 @@ ckpt_0/
 data/
 MOT17DET/
 *.ckpt
+.tar
